@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#  GitHub Profile Snake Animation
+#  功能：每日自动生成贡献图 Snake 动画，推送到 output 分支
+#  作者：Platane/snk
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: Generate Snake
+
+on:
+  # 每天 UTC 00:00 自动运行
+  schedule:
+    - cron: "0 0 * * *"
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate GitHub Contribution Snake
+        uses: Platane/snk@v3
+        id: snake-gif
+        with:
+          # GitHub 用户名自动读取仓库所有者
+          github_user_name: ${{ github.repository_owner }}
+          # 输出文件路径
+          outputs: |
+            dist/github-contribution-grid-snake.svg
+            dist/github-contribution-grid-snake-dark.svg?palette=github-dark
+
+      - name: Push to Output Branch
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
